@@ -8,7 +8,7 @@
 <p>
   
   <h4>Project Vision and Overview</h4>
-  The problem our software addresses is the fragmented and complex communication between students and professors on academic topics. </br>
+  </t>The problem our software addresses is the fragmented and complex communication between students and professors on academic topics. </br>
   Current communication software used by students often feels disconnected from the topics it serves, both in communication and discussion between students and professors.</br>
   Current software applications like Discord, Teams, Slack, and Piazza each have a niche in the industry. </br>
   Teams and Slack dominate larger enterprise communication with numerous integrations and functionalities. </br>
