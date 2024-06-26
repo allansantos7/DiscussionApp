@@ -1,0 +1,67 @@
+﻿@page
+@model LogicLeapPiazzaRemake.Pages.Folders.IndexModel
+@{
+    ViewData["Title"] = "Folders";
+}
+<div class="container">
+    <div class="row">
+        <div class="col-6">
+        </div>
+        <div class="col-6 text-end pb-2">
+            <a asp-page="Upsert" asp-route-id="0" class="btn btn-success">
+                <i class="bi bi-plus-circle"></i> Create New Folder
+            </a>
+        </div>
+    </div>
+    <table class="table table-bordered table-striped" id="foldersTable" style="width:100%">
+        <thead>
+            <tr>
+                <th>
+                    Folder Name
+                </th>
+                <th>Class Name</th>
+                <th>Folder Parent</th>
+                <th>Approved</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var folder in Model.objFolderList)
+            {
+                <tr>
+                    <td>@folder.Name</td>
+                    @if (String.IsNullOrEmpty(@folder.ClassId.ToString()))
+                    {
+                        <td>None</td>
+                    }
+                    else
+                    {
+                        <td>@folder.Class.SemesterTerm - @folder.Class.Name </td>
+                    }
+
+                    @if (String.IsNullOrEmpty(@folder.FolderId.ToString()))
+                    {
+                        <td>None</td>
+                    }
+                    else
+                    {
+                        <td>@folder.ParentFolder.Name</td>
+                    }
+                    @if (folder.Approved == true)
+                    {
+                        <td>Approved</td>
+                    }
+                    else
+                    {
+                        <td>Unapproved</td>
+                    }
+                    <td class="align-items-center">
+                        <a class="btn btn-outline-tertiary p-2 mt-2 w-25 bg-info text-white" asp-page="Upsert" asp-route-id="@folder.Id">Edit</a>
+                        <a class="btn btn-outline-tertiary p-2 mt-2 w-25 bg-danger text-white" asp-page-handler="delete" asp-route-id="@folder.Id">Mark as Unapproved</a>
+                        <a class="btn btn-outline-tertiary p-2 mt-2 bg-success text-white" asp-page="Upsert" asp-page-handler="addSubfolder" asp-route-parentid="@folder.Id" asp-route-classid="@folder.ClassId" style="width: 45%;">Add Subfolder</a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>

@@ -1,0 +1,168 @@
+﻿@page
+@model LogicLeapPiazzaRemake.Pages.Admin.AdminSettingsModel
+@{
+    ViewData["Title"] = "Admin Settings";
+}
+
+<div class="container">
+    <div class="row">
+        <div class="col-md-3">
+            <div class="sidebar">
+                <p class="hidden" id="message">@Model.Message</p>
+                <p class="mb-4">@ViewData["Title"]</p>
+
+                <!-- Clickable Headings Column -->
+                <div class="clickable-headings-column">
+                    @*<ul>
+                    <li><button class="btn clickable-heading" data-section="classSection">Add/Edit Class</button></li>
+                    <li><button class="clickable-heading" data-section="studentSection">Add/Drop Students</button></li>
+                    <li><h2 class="clickable-heading" data-section="postSection">Moderate Posts</h2></li>
+                    <li><h2 class="clickable-heading" data-section="settingsSection">Settings</h2></li>
+                    </ul>*@
+                    <div class="btn-group-vertical">
+                        <button type="button" class="btn btn-light clickable-heading" data-section="classSection">Add/Edit Class</button>
+                        <button type="button" class="btn btn-light clickable-heading" data-section="studentSection">Add/Drop Students</button>
+                        <button type="button" class="btn btn-light clickable-heading" data-section="postSection">Moderate Posts</button>
+                        <button type="button" class="btn btn-light clickable-heading" data-section="settingsSection">Settings</button>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-9">
+            <!-- Sections Display Column -->
+            <div class="sections-column">
+                <!-- Add/Edit Class Section -->
+                <!-- Add/Edit Class Section -->
+                <div id="classSection" class="section border p-4">
+                    <h2>Classes</h2>
+                    <table class="table table-light">
+                        <thead class="p-2">
+                            <tr>
+                                <th>Class Name</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var className in Model.objInstructorEnrollmentList)
+                            {
+                                <tr>
+                                    <td class="p-2">@className.Class.SemesterTerm - @className.Class.Name</td>
+                                    <td>
+                                        <a asp-page="./Upsert/Upsert_Class" asp-route-id="@className.ClassId" class="btn btn-primary">Edit</a>
+                                        <a asp-page="./Delete/Delete_Class" asp-route-id="@className.ClassId" class="btn btn-warning">Drop</a>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                    <a class="btn btn-primary" asp-page="./Upsert/Upsert_Class" asp-route-id="0">Add New Class</a>
+                </div>
+
+
+                <!-- Add/Drop Students Section -->
+                <div id="studentSection" class="section border p-4">
+                    <h2>Students</h2>
+                    <table class="table table-light">
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>Username</th>
+                                <th>Class</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var studentName in Model.objStudentEnrollmentList)
+                            {
+                                <tr>
+                                    <td>@studentName.ApplicationUser.LastName, @studentName.ApplicationUser.FirstName</td>
+                                    <td>@studentName.ApplicationUser.UserName</td>
+                                    <td>@studentName.Class.SemesterTerm - @studentName.Class.Name</td>
+                                    <td>
+                                        <a asp-page="./Delete/Delete_Student" asp-route-id="@studentName.Id" class="btn btn-warning">Drop</a>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                    <a class="btn btn-primary" asp-page="./Upsert/Upsert_Student" asp-route-id="0">Add New Student</a>
+                </div>
+
+
+                <!-- Moderate Posts Section -->
+                <div id="postSection" class="section border p-4">
+                    <h2>Posts</h2>
+                    <form method="post">
+                        <ul class="">
+                            @foreach (var post in Model.objPostList)
+                            {
+                                <li>
+                                    <label>
+                                        <input type="checkbox" name="selectedPosts" value="@post.Id" />
+                                        @post.Folder.Class.SemesterTerm - @post.Folder.Class.Name - @post.Folder.Name - @post.PostTitle
+                                    </label>
+                                </li>
+                            }
+                        </ul>
+                        <button type="submit" class="btn btn-primary">Save</button>
+                    </form>
+                </div>
+
+
+                <!-- Settings Section -->
+                <div id="settingsSection" class="section border p-4">
+                    <div>
+                        <h3>Email Settings</h3>
+                        <!-- Email settings form -->
+                        <ul>
+                            @foreach (var post in Model.objSavedPostList)
+                            {
+                                <li>
+                                    <a asp-page="../Discussions/Post/@post.PostId">@post.Post.PostTitle</a>
+                                </li>
+                            }
+                        </ul>
+                    </div>
+                    <!--<div>
+                    <h3>Notification Settings</h3>-->
+                    <!-- Notification settings form -->
+                    <!--</div>-->
+                    <!--<div>
+                    <h3>Data Collection Settings</h3>-->
+                    <!-- Data collection settings form -->
+                    <!--</div>-->
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts{
+    <script>
+        // Function to hide all sections
+                function hideAllSections() {
+                    document.querySelectorAll('.section').forEach(section => {
+                        section.style.display = "none";
+                    });
+                }
+
+                // Function to toggle section display
+                function toggleSection(sectionId) {
+                    hideAllSections();
+                    var section = document.getElementById(sectionId);
+                    if (section.style.display === "none") {
+                        section.style.display = "block";
+                    } else {
+                        section.style.display = "none";
+                    }
+                }
+
+                // Add event listeners to clickable headings
+                document.querySelectorAll('.clickable-heading').forEach(item => {
+                    item.addEventListener('click', event => {
+                        var sectionId = event.target.dataset.section;
+                        toggleSection(sectionId);
+                    });
+                });</script>
+}

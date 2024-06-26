@@ -1,0 +1,149 @@
+﻿@page
+@using Newtonsoft.Json;
+@model LogicLeapPiazzaRemake.Pages.Admin.ReportsModel
+@{
+    ViewData["Title"] = "Reports";
+}
+<div class="container">
+    <form method="post">
+        <h3>Reports</h3>
+
+        <div class="row">
+            <!-- Filter dropdowns -->
+            <div class="p-2">
+                <label for="filterClassName" class="form-label mt-4">Filter by Class Name:</label>
+                <select id="filterClassName" class="form-select">
+                    <option value="">All Classes</option>
+                </select>
+            </div>
+            
+            <div class="p-2">
+                <label for="filterStudentName" class="form-label mt-1">Filter by Student Name:</label>
+                <select id="filterStudentName" class="form-select">
+                    <option value="">All Students</option>
+                </select>
+            </div>
+            
+        </div>
+        
+
+        <table id="reportsTable" class="table table-hover mt-4">
+            <thead class="p-4">
+                <tr class="table-primary">
+                    <th class="p-2">Class</th>
+                    <th class="p-2">Student</th>
+                    <th class="p-2">Posts</th>
+                    <th class="p-2">Comments</th>
+                    <th class="p-2">Endorsements</th>
+                    <th class="p-2">Tags</th>
+                    <th class="p-2">Upvotes</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var student in Model.reportData)
+                {
+                    <tr class="table-light">
+                        <td class="p-2">@student.Value.ClassName</td>
+                        <td class="p-2">@student.Value.Name</td>
+                        <td class="p-2 text-center">@student.Value.Posts</td>
+                        <td class="p-2 text-center">@student.Value.Comments</td>
+                        <td class="p-2 text-center">@student.Value.Endorsements</td>
+                        <td class="p-2 text-center">@student.Value.Tags</td>
+                        <td class="p-2 text-center">@student.Value.Upvotes</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    
+        <input type="hidden" name="reportData" value="@JsonConvert.SerializeObject(Model.reportData)" />
+        <button type="submit" name="action" value="DownloadPDF" class="btn btn-primary mt-2">Download PDF Report</button>
+        <button type="submit" name="action" value="DownloadExcel" class="btn btn-primary mt-2">Download Excel Report</button>
+    </form>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const classDropdown = document.getElementById('filterClassName');
+        const studentDropdown = document.getElementById('filterStudentName');
+        const table = document.getElementById('reportsTable');
+        const tbody = table.getElementsByTagName('tbody')[0];
+        const rows = Array.from(tbody.rows);
+
+        // Populate dropdowns with unique options
+        const classSet = new Set();
+        const studentSet = new Set();
+        Array.from(rows).forEach(row => {
+            classSet.add(row.cells[0].textContent.trim());
+            studentSet.add(row.cells[1].textContent.trim());
+        });
+        classSet.forEach(cls => {
+            classDropdown.add(new Option(cls, cls));
+        });
+        studentSet.forEach(stud => {
+            studentDropdown.add(new Option(stud, stud));
+        });
+
+        function filterTable() {
+            const selectedClass = classDropdown.value;
+            const selectedStudent = studentDropdown.value;
+
+            for (const row of rows) {
+                const classMatches = (selectedClass === "" || row.cells[0].textContent.trim() === selectedClass);
+                const studentMatches = (selectedStudent === "" || row.cells[1].textContent.trim() === selectedStudent);
+                row.style.display = (classMatches && studentMatches) ? '' : 'none';
+            }
+        }
+        // Updated student dropdown list depending on the selected class
+        function updateStudentDropdown(selectedClass) {
+            const currentStudent = studentDropdown.value; // Preserve the current student selection
+            studentDropdown.innerHTML = '';  // Clear existing options
+            studentDropdown.add(new Option('All Students', ''));  // Add default option
+
+            const filteredStudents = selectedClass === "" ?
+                Array.from(studentSet) :
+                rows.filter(row => row.cells[0].textContent.trim() === selectedClass)
+                    .map(row => row.cells[1].textContent.trim());
+
+            new Set(filteredStudents).forEach(stud => {
+                studentDropdown.add(new Option(stud, stud));
+            });
+
+            // Restore the previously selected student if it still exists in the filtered list
+            if (filteredStudents.includes(currentStudent)) {
+                studentDropdown.value = currentStudent;
+            }
+        }
+
+        function updateClassDropdown(selectedStudent) {
+            const currentClass = classDropdown.value; // Preserve the current class selection
+            classDropdown.innerHTML = '';  // Clear existing options
+            classDropdown.add(new Option('All Classes', ''));  // Add default option
+
+            const filteredClasses = selectedStudent === "" ?
+                Array.from(classSet) :
+                rows.filter(row => row.cells[1].textContent.trim() === selectedStudent)
+                    .map(row => row.cells[0].textContent.trim());
+
+            new Set(filteredClasses).forEach(cls => {
+                classDropdown.add(new Option(cls, cls));
+            });
+
+            // Restore the previosly selected class if it still exists in the filtered list
+            if (filteredClasses.includes(currentClass)) {
+                classDropdown.value = currentClass;
+            }
+        }
+
+        // Event listener for when a new class is selected
+        classDropdown.addEventListener('change', () => {
+            updateStudentDropdown(classDropdown.value);  // Update student dropdown based on class selection
+            filterTable();  // Apply filters
+        });
+        // Event listener for when a new student is selected
+        studentDropdown.addEventListener('change', () => { 
+            updateClassDropdown(studentDropdown.value);
+            filterTable();
+        });
+    });
+//# sourceURL=test
+</script>

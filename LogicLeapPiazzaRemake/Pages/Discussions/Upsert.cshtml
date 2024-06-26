@@ -1,0 +1,29 @@
+﻿@page
+@model LogicLeapPiazzaRemake.Pages.Discussions.UpsertModel
+@{
+}
+
+<form method="post">
+    <div class="form-group">
+        <label asp-for="objPost.PostTitle"></label>
+        <input type="text" class="form-control" asp-for="objPost.PostTitle" id="postTitle" required>
+        @* <span asp-validation-for="objPost.PostTitle" class="text-danger"></span> *@
+    </div>
+    <div class="form-group">
+        <label asp-for="objPost.PostDesc">Content</label>
+        <input type="text" class="form-control" asp-for="objPost.PostDesc" id="postContent" required>
+        @* <span asp-validation-for="objPost.PostDesc" class="text-danger"></span> *@
+    </div>
+    <div class="form-group">
+        <label asp-for="objPost.PostTypeId" id="postTypeId" name="postTypeId">Post Type: </label>
+        <input asp-for="objPost.PostTypeId" type="radio" name="postType" id="postType" value="1" checked /> Question
+        <input asp-for="objPost.PostTypeId" type="radio" name="postType" id="postType" value="2" /> Issue
+        <input asp-for="objPost.PostTypeId" type="radio" name="postType" id="postType" value="3" /> Announcement
+    </div>
+    <div class="form-group">
+        <label asp-for="objPost.StatusId" id="postStatusId" name="postStatusId">Open to Replies :</label>
+        <input asp-for="objPost.StatusId" type="radio" name="postStatus" id="postStatus" value="1" checked /> Yes
+        <input asp-for="objPost.StatusId" type="radio" name="postStatus" id="postStatus" value="2" /> No
+    </div>
+    <button type="submit" class="btn btn-primary">Submit</button>
+</form>

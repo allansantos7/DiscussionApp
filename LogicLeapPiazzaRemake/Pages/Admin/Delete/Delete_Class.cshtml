@@ -1,0 +1,27 @@
+﻿@page
+@model LogicLeapPiazzaRemake.Pages.Discussions.Delete_ClassModel
+@{
+    ViewData["Title"] = "Drop Class";
+}
+
+<div class="card-header bg-secondary bg-gradient ml-0 py-3">
+    <div class="row">
+        <div class="col-12 text-center">
+            <h2 class="text-danger py-2">Drop Class</h2>
+        </div>
+    </div>
+</div>
+<form method="post">
+    <div class="form-group">
+        <label asp-for="objClass.Name"></label>
+        <input readonly type="text" class="form-control bg-dark" asp-for="objClass.Name" id="objClass.Name">
+        @* <span asp-validation-for="objPost.PostTitle" class="text-danger"></span> *@
+    </div>
+
+    <input asp-for="objClass.Id" type="hidden">
+
+    <button type="submit" class="btn btn-primary">Drop</button>
+    <a asp-page="../AdminSettings" class="btn btn-outline-primary border  form-control">
+        Back to List
+    </a>
+</form>

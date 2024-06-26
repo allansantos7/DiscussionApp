@@ -1,0 +1,104 @@
+﻿@page
+@model LogicLeapPiazzaRemake.Pages.Folders.UpsertModel
+@{
+    ViewData["Title"] = (Model.IsUpdate ? "Update Folder" : "Create Folder");
+}
+@using Utility;
+<div class="container">
+    <form method="POST">
+        <div class="card">
+            <div class="card-header">
+                <h2>@(Model.IsUpdate ? "Update" : "Create") Folder</h2>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6 offset-md-3">
+                        <input type="hidden" asp-for="@Model.Type" />
+                        @if (Model.IsUpdate)
+                        {
+                            <input type="hidden" asp-for="@Model.ObjFolder.Id" />
+                            <input type="hidden" asp-for="@Model.IsUpdate" value="true" />
+                            <input type="hidden" asp-for="@Model.ObjFolder.Approved" value="true" />
+
+                            <label asp-for="@Model.ObjFolder.Name">Folder Name</label>
+                            <input class="form-control" asp-for="@Model.ObjFolder.Name" placeholder="Enter a folder name" required />
+
+                            <label asp-for="@Model.ObjFolder.ClassId">Class</label>
+
+                            <select class="form-select" asp-for="@Model.ObjFolder.ClassId" id="classSelect">
+                                @foreach (var obj in Model.objEnrollmentList) {
+                                    <option value="@obj.ClassId">@obj.Class.Name</option>
+                                }
+                            </select>
+
+                            <label asp-for="@Model.ObjFolder.FolderId">Parent Folder</label>
+                            <select class="form-select" asp-for="@Model.ObjFolder.FolderId" id="folderSelect">
+                                <option value=null>None</option>
+                                @foreach (var obj in Model.objFolderList)
+                                {
+                                    <option value="@obj.Id">@obj.Name</option>
+                                }
+                            </select>
+
+                            <label asp-for="@Model.ObjFolder.Approved">Approved?</label>
+                            <br />
+                            <label for="yes">Approved</label>
+                            <input type="radio" id="yes" name="approved" asp-for="@Model.ObjFolder.Approved" value=true />
+                            <br />
+                            <label for="no">Unapproved</label>
+                            <input type="radio" id="no" name="approved" asp-for="@Model.ObjFolder.Approved" value=false />
+                        }
+                        else
+                        {
+                            if (User.IsInRole(SD.InstructorRole))
+                            {
+                                <input type="hidden" asp-for="@Model.ObjFolder.Approved" value="true" />
+                            }
+                            else
+                            {
+                                <input type="hidden" asp-for="@Model.ObjFolder.Approved" value="false" />
+                            }
+
+                            <label asp-for="@Model.ObjFolder.Name">Folder Name</label>
+                            <input class="form-control" asp-for="@Model.ObjFolder.Name" placeholder="Enter a folder name" required />
+
+                            @if (Model.ClassId == 0)
+                            {
+                                <label asp-for="@Model.ObjFolder.ClassId">Class</label>
+                                <select class="form-select" asp-for="@Model.ObjFolder.ClassId" id="classSelect">
+                                    @foreach (var obj in Model.objEnrollmentList)
+                                    {
+                                        <option value="@obj.ClassId">@obj.Class.Name</option>
+
+                                    }
+                                </select>
+                            }
+                            else
+                            {
+                                <input type="hidden" asp-for="@Model.ObjFolder.ClassId" value="@Model.ClassId" />
+                            }
+
+                            @if (Model.ParentId == 0)
+                            {
+                                <label asp-for="@Model.ObjFolder.FolderId">Parent Folder</label>
+                                <select class="form-select" asp-for="@Model.ObjFolder.FolderId" id="folderSelect">
+                                    <option value=null>None</option>
+                                    @foreach (var obj in Model.objFolderList)
+                                    {
+                                        <option value="@obj.Id">@obj.Name</option>
+                                    }
+                                </select>
+                                <input type="hidden" asp-for="@Model.IsUpdate" value="false" />
+                            }
+                            else
+                            {
+                                <input type="hidden" asp-for="@Model.ObjFolder.FolderId" value="@Model.ParentId" />
+                            }
+                        }
+                        <button type="submit" id="button" class="btn btn-primary form-control mt-4">@(Model.IsUpdate ? "Update" : "Create")</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>

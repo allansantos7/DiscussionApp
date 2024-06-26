@@ -1,0 +1,264 @@
+﻿@page
+@model LogicLeapPiazzaRemake.Pages.Discussions.Upsert_ClassModel
+@{
+    // Code below used for determining Semester selection
+    // get the current year
+    int currentYear = DateTime.Now.Year;
+    // get the following year
+    int nextYear = currentYear + 1;
+    // get the current month
+    int currentMonth = DateTime.Now.Month;
+    // determine the current semester season depending on the current month
+    string currentSeason = "";
+    if (currentMonth >= 12 && currentMonth <= 3) // Spring
+    {
+        currentSeason = "Spring";
+    }
+    else if (currentMonth >= 4 && currentMonth <= 7) // Summer
+    {
+        currentSeason = "Summer";
+    }
+    else if (currentMonth >= 8 && currentMonth <= 11) // Fall
+    {
+        currentSeason = "Fall";
+    }
+
+    ViewData["Title"] = "Upsert Class";
+}
+
+<div class="card-header bg-secondary bg-gradient ml-0 py-3">
+    <div class="row">
+        <div class="col-12 text-center">
+            <h1 class="text-warning py-2">
+                Create and/or Select the Class(es) you would like to Enroll into:
+            </h1>
+        </div>
+    </div>
+</div>
+
+<form method="post" class="bg-dark p-2">
+    <div class="form-group text-light">
+        <!--If adding a class-->
+        @if (Model.objClass.Id == 0)
+        {
+            <!--Section for Creating a Class-->
+            <div class="bg-dark p-3 mb-4 rounded">
+                <label asp-for="objClass.Name"><h3>Create a Class:</h3></label>
+                <div class="row">
+                    <div class="col-md">
+                        <label asp-for="objClass.Semester">Select Semester:</label>
+                        <select asp-for="objClass.Semester" class="form-control dark-dropdown" id="objClass.Semester">
+                            <!--Determine which Semester is already selected depending on the current month-->
+                            <option value="Spring" selected="@(currentSeason == "Spring")">Spring</option>
+                            <option value="Summer" selected="@(currentSeason == "Summer")">Summer</option>
+                            <option value="Fall" selected="@(currentSeason == "Fall")">Fall</option>
+                        </select>
+                    </div>
+                    <div class="col-md">
+                        <label asp-for="objClass.SemesterYear">Select Year:</label>
+                        <select asp-for="objClass.SemesterYear" class="form-control dark-dropdown" id="objClass.SemesterYear">
+                            <option value="@currentYear" selected>@currentYear</option>
+                            <option value="@nextYear">@nextYear</option>
+                        </select>
+                    </div>
+                </div>
+                <label asp-for="objClass.Name">Enter Class Name:</label>
+                <input type="text" class="form-control" asp-for="objClass.Name" id="objClass.Name">
+            </div>
+            
+            <!--Section for Selecting a Class-->
+            <div class="bg-dark p-3 rounded">
+                <h3>Select a Class:</h3>
+                <div class="row">
+                    <div class="col-md">
+                        <label asp-for="AllClasses">Select an existing Class:</label>
+                        <select id="classSelect" multiple class="form-control">
+                            @foreach (var objclass in Model.AllClasses)
+                            {
+                                <option value="@objclass.Id">@objclass.SemesterTerm - @objclass.Name</option>
+                            }
+                        </select>
+                        <button type="button" id="addButton" class="btn btn-primary" disabled>Add</button>
+                    </div>
+                    <div class="col-6 col-sm-6">
+                        <label>Filter Class List by input:</label>
+                        <input type="text" class="form-control text-light" id="filterInput" value="@currentYear">
+                    </div>
+                </div>
+                <!--List of Selected Classes-->
+                <div class="form-group">
+                    <label>Selected Class(es):</label>
+                    <ul id="selectedClassesList"></ul>
+                </div>
+            </div>
+        } 
+        else 
+        {
+            <input type="text" class="form-control" asp-for="objClass.Name" id="objClass.Name" required>
+        }
+    </div>
+
+    <!-- Hidden input fields to hold selected items data -->
+    <input type="hidden" id="selectedClasses" name="SelectedClasses" />
+    @if (Model.objClass.Id != 0)
+    {
+        <input asp-for="objClass.Id" type="hidden">
+    }
+    @if (Model.objEnrollment.Id != 0)
+    {
+        <input asp-for="objEnrollment.Id" type="hidden">
+    }
+
+    <!--Buttons separated for testing-->
+    @if (Model.objClass.Id != 0)
+    {
+        <button id="updateButton" type="submit" class="btn btn-primary">Update Class</button>
+    }
+    else
+    {
+        <button id="submitButton" type="submit" class="btn btn-primary" disabled>Create Class(es)</button>
+    }
+
+    <a asp-page="../AdminSettings" class="btn btn-outline-primary border  form-control">
+        Back to List
+    </a>
+</form>
+
+@section Scripts {
+    <script>
+
+        // Array to store selected classes
+        var selectedClasses = [];
+
+        // Function to add class to selected list
+        function addClass() {
+            var select = document.getElementById("classSelect");
+            var selectedOptions = select.selectedOptions;
+
+            for (var i = 0; i < selectedOptions.length; i++) {
+                (function () {
+                    var selectedClassId = selectedOptions[i].value;
+
+                    // Check if class is already selected
+                    if (selectedClasses.indexOf(selectedClassId) === -1) {
+                        selectedClasses.push(selectedClassId);
+                        var listItem = document.createElement("li");
+                        listItem.textContent = selectedOptions[i].text;
+
+                        // Create delete button
+                        var deleteButton = document.createElement("button");
+                        deleteButton.textContent = "Remove";
+                        deleteButton.classList.add("btn", "btn-danger", "btn-sm", "ml-2");
+                        deleteButton.onclick = function () {
+                            removeClass(selectedClassId, listItem);
+
+                            // Enable or disable the add button based on the number of selected options
+                            var addButton = document.getElementById("addButton");
+                            addButton.disabled = selectedOptions.length === 0;
+
+                            // Enable or disable the submit button based on the number of selected options
+                            var submitButton = document.getElementById("submitButton");
+                            if (selectedClasses.length == 0) {
+                                submitButton.disabled = true;
+                            }
+                            else {
+                                submitButton.disabled = false;
+                            }
+                        };
+
+                        listItem.appendChild(deleteButton);
+                        document.getElementById("selectedClassesList").appendChild(listItem);
+                    }
+
+                    // Remove selected class from the select list
+                    selectedOptions[i].remove();
+                })();
+            }
+            document.getElementById("selectedClasses").value = JSON.stringify(selectedClasses);
+        }
+
+        // Function to remove class from selected list
+        function removeClass(selectedClassId, listItem) {
+            var index = selectedClasses.indexOf(selectedClassId);
+            if (index !== -1) {
+                selectedClasses.splice(index, 1);
+            }
+            listItem.remove();
+
+            // Add the removed class back to the select list
+            var select = document.getElementById("classSelect");
+            var option = document.createElement("option");
+            option.value = selectedClassId;
+            option.text = listItem.textContent.split("Remove")[0].trim(); // Get only the name
+            select.appendChild(option);
+
+            document.getElementById("selectedClasses").value = JSON.stringify(selectedClasses);
+        }
+
+        // Function to filter options based on input
+        function filterOptions() {
+            var filterValue = document.getElementById("filterInput").value.toLowerCase();
+            var select = document.getElementById("classSelect");
+            var options = select.options;
+
+            for (var i = 0; i < options.length; i++) {
+                var textValue = options[i].textContent.toLowerCase();
+                var optionValue = options[i].value;
+
+                // Check if the option matches the filter and is not already selected
+                if (textValue.indexOf(filterValue) !== -1 && selectedClasses.indexOf(optionValue) === -1) {
+                    options[i].style.display = "";
+                } else {
+                    options[i].style.display = "none";
+                }
+            }
+        }
+
+        // Event listener for the Class input box
+        document.getElementById("objClass.Name").addEventListener("input", function (event) {
+            var nameInput = document.getElementById("objClass.Name");
+
+            // Enable or disable the submit button if input is also empty
+            var sButton = document.getElementById("submitButton");
+            sButton.disabled = event.target.value.length === 0;
+
+        });
+
+        // Event listener for the Class select list
+        document.getElementById("classSelect").addEventListener("click", function () {
+            var select = document.getElementById("classSelect");
+            var selectedOptions = select.selectedOptions;
+
+            // Enable or disable the add button based on the number of selected options
+            var addButton = document.getElementById("addButton");
+            addButton.disabled = select.selectedOptions.length === 0;
+        });
+
+        // Event listener for add button
+        document.getElementById("addButton").addEventListener("click", function () {
+            addClass();
+
+            // Enable or disable the add button based on the number of selected options
+            var addButton = document.getElementById("addButton");
+            addButton.disabled = true;
+
+            // Enable or disable the submit button based on the number of selected options
+            var select = document.getElementById("classSelect");
+            var submitButton = document.getElementById("submitButton");
+            var selected = document.getElementById("selectedClasses");
+            if (selected.length === 0) {
+                submitButton.disabled = select.length === 0;
+            }
+            else {
+                submitButton.disabled = false;
+            }
+        });
+
+        // Event listener for filter input
+        document.getElementById("filterInput").addEventListener("input", function () {
+            filterOptions();
+        });
+
+        filterOptions();
+    </script>
+}

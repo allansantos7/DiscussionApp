@@ -1,0 +1,92 @@
+﻿@using Utility
+@using Microsoft.AspNetCore.Identity
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - LogicLeapPiazzaRemake</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/site-custom.css" asp-append-version="true" />
+
+    @*<link rel="stylesheet" href="~/LogicLeapPiazzaRemake.styles.css" asp-append-version="true" />*@
+    <link rel="stylesheet" href="~/lib/font-awesome/css/all.min.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/sweetalert2/11.10.4/sweetalert2.css" />
+    <link rel="stylesheet" href="//cdn.datatables.net/1.13.7/css/jquery.dataTables.min.css" />
+</head>
+<body class="">
+    <header class="bg-dark">
+        <nav class="navbar navbar-expand-lg navbar-dark bg-dark" data-bs-theme="dark">
+
+            <div class="container-fluid">
+                <a class="navbar-brand" asp-area="" asp-page="/Index"><i class="fa-solid fa-comments"></i></a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavDropdown" aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+
+                <div class="collapse navbar-collapse" id="navbarNavDropdown">
+                    <ul class="navbar-nav">
+                        <li class="nav-item pe-4 me-4">
+                            <a class="nav-link active" asp-area="" asp-page="/Index">Conversa</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" asp-area="" asp-page="/About">About</a>
+
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" asp-area="" asp-page="/Discussions/Index">Discussions</a>
+
+                        </li>
+                        @if (User.IsInRole(SD.InstructorRole))
+                        {
+                            <li class="nav-item dropdown">
+                                <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                    Admin Pages
+                                </a>
+                                <ul class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
+                                    <a class="dropdown-item" asp-area="" asp-page="/Admin/Reports">Reports</a>
+                                    <a class="dropdown-item" asp-area="" asp-page="/Admin/AdminSettings">Admin Settings</a>
+                                    <div class="dropdown-divider"></div>
+                                    <a class="dropdown-item" asp-area="" asp-page="/Users/Index">Users</a>
+                                    <a class="dropdown-item" asp-area="" asp-page="/Roles/Index">Roles</a>
+                                    <div class="dropdown-divider"></div>
+                                    <a class="dropdown-item" asp-area"" asp-page="/Folders/Index">Manage Folders</a>
+                                </ul>
+                            </li>
+                        }
+                    </ul>
+                    <partial name="_LoginPartial" />
+                </div>
+            </div>
+        </nav>
+        @if (!Context.Request.Path.ToString().ToLower().Contains("/admin/") && !Context.Request.Path.ToString().ToLower().Contains("about") && !Context.Request.Path.ToString().ToLower().Contains("account") && !Context.Request.Path.ToString().ToLower().Contains("post"))
+        {
+            <partial name="_ClassSelectPartial" />
+        }
+
+    </header>
+    <div class="custom-bg-color">
+        <main role="main" class="pt-3 main-height">
+            <partial name="_ToastrNotification" />
+
+            @RenderBody()
+        </main>
+    </div>
+
+    <footer class="p-4 border-top text-muted bg-dark">
+        <div class="">
+            &copy; 2024 - LogicLeapTechnologies Conversa Application - <a asp-area="" asp-page="/Privacy">Privacy</a>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta2/dist/js/bootstrap.bundle.min.js" integrity="sha384-b5kHyXgcpbZJO/tY9Ul7kGkf1S0CWuKcCD38l8YkeH8z8QjE0GmW1gYU5S9FOnJ0" crossorigin="anonymous"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+    <script type="text/javascript" src="//tinymce.cachefly.net/4.0/tinymce.min.js"></script>
+    <script src="https://cdn.tiny.cloud/1/5mhh69z795oqwvsb5r5cvzv1n8v0zllu3sft8o947z6nbhrh/tinymce/5/tinymce.min.js" referrerpolicy="origin"></script>
+
+
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

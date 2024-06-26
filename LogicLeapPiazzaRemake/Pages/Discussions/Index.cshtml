@@ -1,0 +1,257 @@
+﻿@page
+@using Utility
+@model LogicLeapPiazzaRemake.Pages.Discussions.IndexModel
+@{
+    ViewData["Title"] = "Discussions";
+}
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<div class="custom-bg-color">
+    <div class="main p-4">
+        <div class="text-end me-4 pe-4">
+            <button class="btn btn-outline-info" id="addPostButton">Add Post</button>
+        </div>
+        <button class="btn btn-outline-success" id="toggleButton"><i class="fas fa-filter"></i></button>
+        <div class="modal fade" id="addPostModal" tabindex="-1" role="dialog" aria-labelledby="addPostModalLabel" aria-hidden="true">
+            <div class="modal-dialog" role="document">
+
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="addPostModalLabel">Add New Post</h5>
+                        <button type="button" class="btn btn-primary close" data-dismiss="modal" id="closeModal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <form method="post" enctype="multipart/form-data" id="addPostForm">
+                            <input type="hidden" value="@Model.objPost.EnrollmentId" name="EnrollmentId" />
+                            <div class="text-danger" asp-validation-summary="All" role="alert"></div>
+                            <div class="form-group">
+                                <label asp-for="objPost.PostTypeId">Post Type: </label><br />
+                                <input asp-for="objPost.PostTypeId" type="radio" id="question" value="1" /> <label for="question">Question</label><br />
+                                <input asp-for="objPost.PostTypeId" type="radio" id="issue" value="2" /> <label for="issue">Issue</label><br />
+                                <input asp-for="objPost.PostTypeId" type="radio" id="announcement" value="3" /> <label for="announcement">Announcement</label>
+                                <span asp-validation-for="objPost.PostTypeId" class="text-danger"></span>
+                            </div>
+                            <div class="form-group">
+                                <label asp-for="objPost.FolderId">Choose a Folder</label>
+                                <select class="form-select" asp-for="objPost.FolderId">
+                                    <option value="">None</option>
+                                    @foreach (var obj in Model.objFolderList)
+                                    {
+                                        <option value="@obj.Id">@obj.Name</option>
+                                    }
+                                </select>
+                                <span asp-validation-for="objPost.FolderId" class="text-danger"></span>
+                            </div>
+                            <div class="form-group">
+                                <label asp-for="objPost.PostTitle"></label>
+                                <input type="text" class="form-control" asp-for="objPost.PostTitle" id="postTitle">
+                                <span asp-validation-for="objPost.PostTitle" class="text-danger"></span>
+                            </div>
+                            <div class="form-group">
+                                <label asp-for="objPost.PostDesc">Content</label>
+                                <textarea class="form-control" asp-for="objPost.PostDesc" id="postContent" rows="3"></textarea>
+                                <span asp-validation-for="objPost.PostDesc" class="text-danger"></span>
+                            </div>
+                            <div class="form-group">
+                                <label for="imageUrl">Image Upload</label>
+                                <input id="imageUploadArea" type="file" name="imageUrl" class="form-control" accept="image/png, image/gif, image/jpeg" />
+                            </div>
+                            <div class="form-group">
+                                <label asp-for="objPost.StatusId">Open to Replies :</label><br />
+                                <input asp-for="objPost.StatusId" type="radio" id="yes" value="1" checked /> <label for="yes">Yes</label><br />
+                                <input asp-for="objPost.StatusId" type="radio" id="no" value="2" /> <label for="no">No</label>
+                                <span asp-validation-for="objPost.StatusId" class="text-danger"></span>
+                            </div>
+                            <!-- Error message placeholder -->
+                            <div id="errorText" class="text-danger"></div>
+                            <button type="submit" class="btn btn-primary" id="submitButton">Submit</button>
+                        </form>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+        <br />
+
+        <br />
+
+        <div class="row">
+
+            <div class="col col-2 mx-2" id="column1" style="display: visible;">
+                <!-- Added id for column 1 -->
+                <div class="container mt-3 p-2 border border-outline-primary">
+                    <form method="POST">
+                        <div class="form-group pt-2">
+                            <label for="searchBox">Filter by Keyword or Phrase</label>
+                            <input class="form-control" type="text" name="searchBox" id="searchBox" value="@(Model.SearchBoxContent.Equals(string.Empty) ? "" : Model.SearchBoxContent)" placeholder="Enter search here" />
+
+                            <div class="pt-2">
+                                <label for="folderSelect">Filter by Folder(s)</label>
+                                <select class="form-select" style="min-height: 150px; max-height: 500px;" name="folderSelect" id="folderSelect" multiple onchange="return resetSelection();">
+                                    <option value="null" selected>None</option>
+                                    @foreach (var folder in Model.AllFolders)
+                                    {
+                                        <option value="@folder.Id">@folder.Name</option>
+                                    }
+                                </select>
+                            </div>
+
+                            <div class="pt-2">
+                                <label for="statusSelect">Filter by Post Status</label>
+                                <select class="form-select" name="statusSelect" id="statusSelect">
+                                    <option value="null" selected>None</option>
+                                    @foreach (var status in Model.objStatusList)
+                                    {
+                                        <option value="@status.Id">@status.StatusName</option>
+                                    }
+                                </select>
+                            </div>
+
+                            <div class="pt-2">
+                                <label for="dateSelect">Filter by Date:</label>
+                                <select class="form-select" name="dateSelect" id="dateSelect">
+                                    <option value="null" selected>None</option>
+                                    <option value="@Double.Parse("1.0")">Last 24 Hours</option>
+                                    <option value="@Double.Parse("7.0")">Last Week</option>
+                                    <option value="@Double.Parse("14.0")">Last 2 Weeks</option>
+                                    <option value="@Double.Parse("31.0")">Last Month</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <button type="submit" class="form-control btn btn-primary p-2 mt-2 w-100 text-secondary" asp-page-handler="Filter">Filter!</button>
+                    </form>
+                </div>
+            </div>
+            
+
+            <div class="col px-4 mx-2" id="column2">
+                <!-- Added id for column 2 -->
+                <h3 class="text-center"><i class="fas fa-comments me-2"></i>Discussions</h3>
+                <div class="row">                        
+
+                    @foreach (var post in Model.objPostList.OrderByDescending(p => p.Created))
+                    {
+                        @if (post.StatusId == 1)
+                        {
+                            <a asp-area="" asp-page="/Discussions/Post" asp-route-id="@post.Id">
+                                <div class="alert alert-dismissible alert-primary" style="max-width: 200rem;">
+                                    <h4 class="alert-heading">@post.PostTitle</h4>
+                                    <p>@post.Created</p>
+                                    <p>Open</p>
+                                    @if (post.Folder != null)
+                                    {
+                                        <span class="badge bg-success text-center p-1">@post.Folder.Name</span>
+                                    }
+                                </div>
+                            </a>
+                        }
+                        @if (post.StatusId == 3 || post.StatusId == 4 || post.StatusId == 2)
+                        {
+                            <a asp-area="" asp-page="/Discussions/Post" asp-route-id="@post.Id">
+                                <div class="alert alert-dismissible alert-success" style="max-width: 200rem;">
+                                    <h4 class="alert-heading">@post.PostTitle</h4>
+                                    <p>@post.Created</p>
+                                    <p>Resolved</p>
+                                    @if (!String.IsNullOrEmpty(post.FolderId.ToString()))
+                                    {
+                                        <span class="badge bg-success text-center p-1">@post.Folder.Name</span>
+                                    }
+                                </div>
+                            </a>
+                        }
+                    }
+
+                    @if (!Model.objPostList.Any())
+                    {
+                        <p>No posts found.</p>
+                    }
+                </div>
+            </div>
+
+            </div>
+
+        </div>
+    </div>
+
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+            $("#toggleButton").click(function () {
+                $("#column1").toggle(); // Toggle visibility of column 1
+            });
+        });
+    </script>
+
+    <script>
+        $(document).ready(function () {
+            // Initialize TinyMCE editor
+            tinymce.init({
+                selector: '#postContent', // Textarea ID for the editor
+                plugins: 'advlist autolink lists link image charmap print preview hr anchor pagebreak',
+                toolbar_mode: 'floating',
+                height: 300,
+                forced_root_block: "",
+                paste_as_text: true // Enable paste as plain text
+            });
+            
+
+            // Handle click event of Add Post button
+            $('#addPostButton').click(function () {
+                $('#addPostModal').modal('show'); // Show the modal for adding new post
+            });
+
+            $("#closeModal").click(() => {
+                $("#addPostModal").modal("hide");
+            });
+        });
+    </script>
+
+    <script>
+        function resetSelection() {
+            var select = document.getElementById("folderSelect"), option, i;
+            if (select[0].selected) {
+                for (i = 0; i < select.length; i++) {
+                    option = select[i]
+                    if (option.selected && option.value != "null") {
+                        option.selected = false;
+                    }
+                }
+            }
+            return;
+        }
+
+        if (window.history.replaceState) {
+            window.history.replaceState(null, null, window.location.href);
+        }
+    </script>
+    <script>
+        $(document).ready(function () {
+            $('#addPostForm').submit(function (event) {
+                // Prevent the default form submission behavior
+                event.preventDefault();
+
+                // Validate form fields
+                var postTitle = $('#postTitle').val().trim();
+                var postContent = $('#postContent').val().trim();
+                var folderId = $('#folderSelect').val();
+
+                // Clear previous error messages
+                $('#errorText').text('');
+
+                // Check if any required field is empty
+                if (postTitle === '' || postContent === '' || folderId === null) {
+                    // Display error message in the modal
+                    $('#errorText').text('Please fill out all required fields.');
+                } else {
+                    // If all fields are filled, submit the form
+                    $(this).unbind('submit').submit();
+                }
+            });
+        });
+
+    </script>
+}
+

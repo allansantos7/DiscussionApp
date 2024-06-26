@@ -1,0 +1,208 @@
+﻿@page
+@model LogicLeapPiazzaRemake.Pages.Discussions.Upsert_StudentModel
+@{
+    ViewData["Title"] = "Upsert Student";
+}
+
+<form method="post" name="form1" id="form1" class="bg-dark p-2">
+    <div class="form-group text-light">
+        @(Model.objEnrollment.ApplicationUserId != null ? "Update" : "Add") Student(s) to Class:
+        <ul>
+            @foreach (var enroll in Model.objInstructorEnrollmentList)
+            {
+                <li>
+                    @enroll.Class.SemesterTerm - @enroll.Class.Name
+                    <input asp-for="@Model.objEnrollment.ClassId" type="radio" id="@($"classId_{enroll.ClassId}")" value="@enroll.ClassId" required />
+                </li>
+            }
+        </ul>
+    </div>
+    <div class="row">
+        <div class="col-md">
+            @*Only Display if Adding not Editing*@
+            @if (Model.objEnrollment.Id == 0)
+            {
+                <div class="form-group text-bg-dark">
+                    <!--Select List of Students-->
+                    <label for="studentSelect">Select Which Student(s) to Enroll:</label>
+                    <select id="studentSelect" multiple class="form-control">
+                        @foreach (var student in Model.AllStudents)
+                        {
+                            <option value="@student.Id">@student.LastName, @student.FirstName - @student.UserName</option>
+                        }
+                    </select>
+                    <button type="button" id="addButton" class="btn btn-primary" disabled>Add</button>
+                </div>
+                <!--List of Selected Students-->
+                <div class="form-group">
+                    <label>Selected Student(s):</label>
+                    <ul id="selectedStudentsList"></ul>
+                </div>
+            }
+            else
+            {
+                <label asp-for="objEnrollment.ApplicationUser.FirstName"></label>
+                <input readonly type="text" class="form-control text-dark" asp-for="objEnrollment.ApplicationUser.FirstName" id="studentFirst">
+            }
+        </div>
+        <div class="col-6 col-sm-6">
+            <div class="form-group text-bg-dark">
+                @if (@Model.objEnrollment.Id == 0)
+                {
+                    <label>Filter Student List by input:</label>
+                    <input type="text" class="form-control text-light" id="filterInput">
+                }
+                else
+                {
+                    <label asp-for="objEnrollment.ApplicationUser.LastName"></label>
+                    <input readonly type="text" class="form-control text-dark" asp-for="objEnrollment.ApplicationUser.LastName" id="studentLast">
+                }
+            </div>
+        </div>
+    </div>
+
+    <!-- Hidden input fields to hold selected items data -->
+    <input type="hidden" id="selectedStudents" name="SelectedStudents" />
+    <input asp-for="@Model.objEnrollment.Id" type="hidden">
+
+    <!--Buttons separated for testing-->
+    @if (Model.objEnrollment.ApplicationUserId != null)
+    {
+        <button type="submit" class="btn btn-primary">Update Class</button>
+    }
+    else
+    {
+        <button id="submitButton" type="submit" class="btn btn-primary" disabled>Enroll Student(s) to Class</button>
+    }
+
+    <a asp-page="../AdminSettings" class="btn btn-outline-primary border  form-control">
+        Back to List
+    </a>
+</form>
+
+@section Scripts {
+    <script>
+        // Array to store selected students
+        var selectedStudents = [];
+        // var selectedStudentIds = [];
+
+        // Function to add student to selected list
+        function addStudent() {
+            var select = document.getElementById("studentSelect");
+            var selectedOptions = select.selectedOptions;
+
+            for (var i = 0; i < selectedOptions.length; i++) {
+                var selectedStudentId = selectedOptions[i].value;
+
+                // Check if student is already selected
+                if (selectedStudents.indexOf(selectedStudentId) === -1) {
+                    selectedStudents.push(selectedStudentId);
+                    var listItem = document.createElement("li");
+                    listItem.textContent = selectedOptions[i].text;
+
+                    // Create delete button
+                    var deleteButton = document.createElement("button");
+                    deleteButton.textContent = "Remove";
+                    deleteButton.classList.add("btn", "btn-danger", "btn-sm", "ml-2");
+                    deleteButton.onclick = function () {
+                        removeStudent(selectedStudentId, listItem);
+
+                        // Enable or disable the submit button based on the number of selected options
+                        var submitButton = document.getElementById("submitButton");
+                        if (selectedStudents.length == 0) {
+                            submitButton.disabled = true;
+                        }
+                        else {
+                            submitButton.disabled = false;
+                        }
+                    };
+
+                    listItem.appendChild(deleteButton);
+                    document.getElementById("selectedStudentsList").appendChild(listItem);
+                }
+
+                // Remove selected student from the select list
+                selectedOptions[i].remove();
+
+            }
+            document.getElementById("selectedStudents").value = JSON.stringify(selectedStudents);
+        }
+
+        // Function to remove student from selected list
+        function removeStudent(studentId, listItem) {
+            var index = selectedStudents.indexOf(studentId);
+            if (index !== -1) {
+                selectedStudents.splice(index, 1);
+            }
+            listItem.remove();
+
+            // Add the removed student back to the select list
+            var select = document.getElementById("studentSelect");
+            var option = document.createElement("option");
+            option.value = studentId;
+            option.text = listItem.textContent.split("Remove")[0].trim(); // Get only the name
+            select.appendChild(option);
+
+            document.getElementById("selectedStudents").value = JSON.stringify(selectedStudents);
+
+        }
+
+        // Function to filter options based on input
+        function filterOptions() {
+            var filterValue = document.getElementById("filterInput").value.toLowerCase();
+            var select = document.getElementById("studentSelect");
+            var options = select.options;
+
+            for (var i = 0; i < options.length; i++) {
+                var textValue = options[i].textContent.toLowerCase();
+                var optionValue = options[i].value;
+
+                // Check if the option matches the filter and is not already selected
+                if (textValue.indexOf(filterValue) !== -1 && selectedStudents.indexOf(optionValue) === -1) {
+                    options[i].style.display = "";
+                } else {
+                    options[i].style.display = "none";
+                }
+            }
+        }
+
+        // Event listener for the Student select list
+        document.getElementById("studentSelect").addEventListener("click", function () {
+            var select = document.getElementById("studentSelect");
+            var selectedOptions = select.selectedOptions;
+
+            // Enable or disable the add button based on the number of selected options
+            var addButton = document.getElementById("addButton");
+            addButton.disabled = select.selectedOptions.length === 0;
+        });
+
+        // Event listener for add button
+        document.getElementById("addButton").addEventListener("click", function () {
+            addStudent();
+
+            // Enable or disable the add button based on the number of selected options
+            var addButton = document.getElementById("addButton");
+            addButton.disabled = true;
+
+            // Enable or disable the submit button based on the number of selected options
+            var select = document.getElementById("studentSelect");
+            var submitButton = document.getElementById("submitButton");
+            var selected = document.getElementById("selectedStudents");
+            if (selected.length === 0) {
+                submitButton.disabled = select.length === 0;
+            }
+            else {
+                submitButton.disabled = false;
+            }
+
+        });
+
+        // Event listener for filter input
+        document.getElementById("filterInput").addEventListener("input", function () {
+            filterOptions();
+        });
+
+        // Initial filter options
+        filterOptions();
+    </script>
+}

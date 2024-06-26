@@ -1,0 +1,32 @@
+﻿@using DataAccess
+@using Infrastructure.Models
+@using LogicLeapPiazzaRemake.Services
+@using Microsoft.AspNetCore.Identity
+@inject UnitOfWork _unit
+@inject SignInManager<ApplicationUser> SignInManager
+@inject UserManager<ApplicationUser> UserManager
+@inject IUserSessionService _userSession
+
+@{
+
+}
+
+@if (SignInManager.IsSignedIn(User))
+{
+    <div>
+        <form method="post">
+            <select id="SelectedClass" name="SelectedClass" onchange="this.form.submit()">
+                @foreach (var e in _unit.Enrollment.GetAll(c => c.ApplicationUser.Id == UserManager.GetUserId(User) && c.Status == EnrollmentStatus.Active, includes: "ApplicationUser,Class").OrderBy(c => c.Class.SemesterTerm).ThenBy(c => c.Class.Name))
+                {
+                    @if (_userSession.GetUserSession().ClassId == e.ClassId)
+                    {
+                        <option selected="selected" value="@e.Class.Id">@_unit.Class.Get(c => c.Id == e.Class.Id).SemesterTerm - @_unit.Class.Get(c => c.Id == e.Class.Id).Name</option>
+                    }
+                    else
+                    {
+                        <option value="@e.Class.Id">@_unit.Class.Get(c => c.Id == e.Class.Id).SemesterTerm - @_unit.Class.Get(c => c.Id == e.Class.Id).Name</option>
+                    }
+                }
+        </form>
+    </div>
+}

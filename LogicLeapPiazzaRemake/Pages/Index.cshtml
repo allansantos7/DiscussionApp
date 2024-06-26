@@ -1,0 +1,220 @@
+﻿@page
+@model IndexModel
+@{
+    ViewData["Title"] = "Home";
+}
+
+<div class="">
+
+    <div class="">
+        <div class="row row-main">
+
+            <div class="col col-2 col-left">
+                <div class="stats text-center p-2">
+                    <a href="#tags">
+                        <i class="fas fa-at"></i>
+                    </a>
+                    <br />
+                    <p>@Model.TotalTags</p>
+
+
+                    <br />
+
+                    <a href="#endorsements">
+                        <p><i class="fas fa-stamp"></i></p>
+                    </a>
+                    <p>@Model.TotalEndorsedComments</p>
+
+                    <br />
+                    <a href="#saved">
+                        <p><i class="fas fa-bookmark"></i></p>
+                    </a>
+                    <p>@Model.TotalSavedPosts</p>
+
+                    <br />
+
+                </div>
+            </div>
+            <div class="col col-5 col-middle">
+                <div class="posts">
+                    <h3 class="text-center"><i class="fas fa-fire px-2"></i>Trending Posts</h3>
+
+
+                    @foreach (var post in Model.objPostList.OrderByDescending(p => p.Created).Take(8))
+                    {
+                        @if (post.StatusId == 1)
+                        {
+                            var folderName1 = Model.objFolderList.FirstOrDefault(f => f.Id == post.FolderId)?.Name;
+
+                            <a asp-page="/Discussions/Post" asp-route-id="@post.Id">
+                                <div class="alert alert-dismissible alert-primary">
+                                    <h6 class="alert-heading">@post.PostTitle</h6>
+                                    <span class="badge bg-secondary p-1 mt-1">@folderName1</span>
+                                </div>
+                            </a>
+                        }
+                        @if (post.StatusId == 2 || post.StatusId == 3 || post.StatusId == 4)
+                        {
+                            var folderName2 = Model.objFolderList.FirstOrDefault(f => f.Id == post.FolderId)?.Name;
+
+                            <a asp-page="/Discussions/Post" asp-route-id="@post.Id">
+                                <div class="alert alert-dismissible alert-success">
+                                    <h6 class="alert-heading">@post.PostTitle</h6>
+                                    <span class="badge bg-secondary p-1 mt-1">@folderName2</span>
+                                    <p class="text-end">Resolved</p>
+                                </div>
+                            </a>
+                        }
+                    }
+
+                </div>
+            </div>
+            <div class="col col-5 col-right">
+                <div class="announcements p-2">
+                    <div class="text-center">
+                        <h3 class=""><i class="fas fa-bullhorn px-2"></i>Announcements</h3>
+
+                    </div>
+                    <div class="mt-1">
+                        @foreach (var post in Model.objPostList)
+                        {
+                            <div class="row pb-1">
+                                @if (post.PostTypeId == 3)
+                                {
+
+                                    <div class="col-2 text-center border bg-secondary justify-content-center">
+                                        <em class="card-text announce-month"><strong>@post.Created.ToString("MMMM")</strong></em>
+                                        <p class="card-text announce-day">@post.Created.ToString("dd")</p>
+
+                                    </div>
+                                    <div class="col-9 border">
+
+                                        <h5 class="card-title ps-2">@post.PostTitle</h5>
+                                    </div>
+
+                                }
+                            </div>
+                        }
+
+                    </div>
+
+                </div>
+            </div>
+
+
+     </div>
+        <svg class="" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 320"><path fill="#212529" fill-opacity="1" d="M0,224L48,229.3C96,235,192,245,288,208C384,171,480,85,576,96C672,107,768,213,864,266.7C960,320,1056,320,1152,304C1248,288,1344,256,1392,240L1440,224L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z"></path></svg>
+
+        <div class="background-dark p-2">
+            <div class="p-2">
+
+                <div class="background-dark p-2 border" id="endorsements">
+
+                    @if (Model.objendorsedCommentList.Count() > 0)
+                    {
+                        <h3 class="text-center"><i class="fas fa-stamp pe-2"></i>Endorsements</h3>
+                        <div class="list-group mb-2">
+                            @foreach (var comment in Model.objendorsedCommentList)
+                            {
+                                @if(comment.StatusId != 5)
+                                {
+                                    <a href="/Discussions/Post/@comment.Id" class="list-group-item list-group-item-action flex-column align-items-start">
+
+                                        <p class="mb-1">@comment.PostTitle </p>
+                                    </a>
+                                }
+                                
+                            }
+
+
+
+                        </div>
+
+                    }
+                    else
+                    {
+                        <h3 class="text-center"><i class="fas fa-stamp pe-2"></i>Endorsements</h3>
+                        <p>No comments to display</p>
+                    }
+                </div>
+                <br /><br />
+                <div class="background-dark p-2 border" id="tags">
+                    <h3 class="text-center"><i class="fas fa-at pe-2"></i>Tags</h3>
+                    @if (Model.MentionedComments.Count() > 0)
+                    {
+                        <div class="list-group mb-2">
+                            <h6 class="text-success p-2">Mentioned Comments</h6>
+                            @foreach (var comment in Model.MentionedComments)
+                            {
+                                <a href="/Discussions/Post/@comment.PostId" class="list-group-item list-group-item-action flex-column align-items-start">
+                                    <p class="mb-1">@Html.Raw(comment.Note.Length > 200 ? comment.Note.Substring(0, 200) + "..." : comment.Note) </p>
+                                </a>
+                            }
+                        </div>
+                    }
+                    else
+                    {
+                        <p>No mentioned comments to display</p>
+                    }
+
+                    @if (Model.MentionedPosts.Count() > 0)
+                    {
+                        <div class="list-group">
+                            <h6 class="text-success p-2">Mentioned Posts</h6>
+                            @foreach (var post in Model.MentionedPosts)
+                            {
+                                <a href="/Discussions/Post/@post.Id" class="list-group-item list-group-item-action flex-column align-items-start">
+                                    <div class="d-flex w-100 justify-content-between">
+                                        <h5 class="mb-1">@post.PostTitle</h5>
+                                    </div>
+                                </a>
+
+                            }
+                        </div>
+                    }
+                    else
+                    {
+
+                        <p>No Mentioned posts found.</p>
+                    }
+
+
+                </div>
+                <div class="background-dark p-2 mt-4 border" id="saved">
+
+                    @if (Model.SavedPosts.Count() > 0)
+                    {
+                        <h3 class="text-center"><i class="fas fa-bookmark pe-2"></i>Saved Posts</h3>
+
+                        <div class="list-group">
+
+                            @foreach (var savedPost in Model.SavedPosts)
+                            {
+                                @if(savedPost.Post.StatusId != 5)
+                                {
+                                    <a href="/Discussions/Post/@savedPost.PostId" class="list-group-item list-group-item-action flex-column align-items-start">
+
+                                        <div class="saved-post border p-2">
+                                            <h5 class="mb-1">@savedPost.Post.PostTitle</h5>
+
+                                        </div>
+                                    </a>
+                                }
+                            }
+                                
+                            
+                        </div>
+                    }
+                    else
+                    {
+                        <h3 class="text-center"><i class="fas fa-bookmark pe-2"></i>Saved Posts</h3>
+
+                        <p>No saved posts found.</p>
+                    }
+                </div>
+
+            </div>
+        </div>
+
+    </div>
+</div>

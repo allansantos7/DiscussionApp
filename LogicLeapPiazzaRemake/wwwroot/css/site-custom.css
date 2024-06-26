@@ -1,0 +1,159 @@
+﻿html {
+    scroll-behavior: smooth;
+}
+
+.main-height {
+    min-height: 100vh;
+}
+
+a {
+    text-decoration: none;
+}
+
+.custom-bg-color {
+    background: rgb(36,32,32);
+    background: linear-gradient(90deg, rgba(36,32,32,1) 14%, rgba(41,130,181,1) 67%, rgba(47,129,93,1) 100%);
+}
+
+.tag {
+    background-color: rgba(var(--bs-info-rgb), var(--bs-text-opacity)) !important;
+    padding: .7em;
+    max-width: 10%;
+    border-radius: 20px;
+}
+
+.post-display {
+    max-width: 80%;
+    margin: 0 auto;
+    margin-bottom: 2em;
+}
+
+.post-icons .fas {
+    margin-right: 1em;
+    font-size: large;
+}
+
+.comment-icons .fas {
+    margin-right: 1em;
+    font-size: small;
+}
+
+.post-comment-display {
+    padding: 1em;
+    margin-left: 27%;
+    max-width: 70%;
+}
+
+.announce-month {
+    padding-bottom: -2em;
+    color: black;
+}
+
+.announce-day {
+    font-size: large;
+    color: black;
+}
+
+.col-left i {
+    font-size: large;
+}
+
+.col-right{
+    padding-left: 5%;
+}
+
+.middle {
+    padding-left: 5%;
+}
+
+.row-main {
+    margin: 0;
+    margin-bottom: -4em;
+}
+
+.background-dark {
+    background-color: #212529;
+    width: 100%;
+    margin: 0;
+}
+
+svg {
+    margin-bottom: -5px;
+    margin-top: -75px;
+    padding: 0;
+}
+
+.main-bottom {
+    width: 70%;
+    margin: 0 auto;
+}
+
+/*.saved-post:hover{
+    color: black;
+    background-color: white;
+}*/
+
+.card-body > button {
+    border: none;
+    background-color: none;
+}
+
+.post-comment {
+}
+
+/* Custom CSS for sidebar and sections */
+.sidebar {
+    padding: 20px;
+    padding-right: 0px;
+    height: 100vh;
+    overflow-y: auto;
+    border-right: 1px solid white;
+}
+
+.clickable-headings-column {
+    margin-bottom: 20px;
+}
+
+.clickable-headings-column ul {
+    list-style-type: none;
+    padding-left: 0;
+}
+
+.clickable-headings-column li {
+    padding: 20px;
+    border: 1px solid white;
+}
+
+.clickable-headings-column h2 {
+    cursor: pointer;
+}
+
+.sections-column {
+    padding: 20px;
+    height: 100vh;
+    overflow-y: auto;
+}
+
+.section {
+    display: none;
+}
+
+.section h2 {
+}
+
+.section th {
+    padding: 2em;
+}
+
+.section td {
+    padding: 1em;
+}
+
+#DeleteComment {
+    padding: 0;
+    margin: 0;
+}
+
+/*#reportsTable {
+    border: .5px solid white;
+}*/
