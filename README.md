@@ -1,4 +1,4 @@
-![image](https://github.com/allansantos7/DiscussionApp/assets/83974830/44119549-38c5-4707-806f-e9e50ffd1f8f)![image](https://github.com/allansantos7/DiscussionApp/assets/83974830/314e505f-d786-4c3a-98cb-9917ae8df58a)
+![image](https://github.com/allansantos7/DiscussionApp/assets/83974830/314e505f-d786-4c3a-98cb-9917ae8df58a)
 <h4>Project created as a member of Logic Leap Technologies </h4>
 <h4>https://github.com/Logic-Leap-Technologies</h4>
 
@@ -24,5 +24,6 @@
   This includes ways for professors to set and manage topics and students, while also allowing for freedom and flexibility of communication among the students. </br>
   </br>
   &emsp;We want to incorporate well managed topics and a hard focus on an academic “feel” so that students and professors can stay on topic while also feeling free to communicate in multiple ways.</br>
+</br>
   <i>Taken from the About page in the project.</i> </br>
 </p>
