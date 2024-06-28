@@ -1,5 +1,5 @@
 ![image](https://github.com/allansantos7/DiscussionApp/assets/83974830/314e505f-d786-4c3a-98cb-9917ae8df58a)
-<h4>Project co-created with Logic Leap Technologies </h4>
+<h4>Project co-created with other members of Logic Leap Technologies </h4>
 <h4>https://github.com/Logic-Leap-Technologies</h4>
 
 <h1>Conversa Messaging Application</h1>
